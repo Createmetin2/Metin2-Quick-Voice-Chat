@@ -4,6 +4,7 @@
 ///Add
 #if defined(VOICE_CHAT)
 	VoiceChatTime = 0;
+	mutelist.clear();
 #endif
 
 //Find
@@ -31,5 +32,40 @@ void CGuild::SendGuildVoiceToAll(LPCHARACTER ch, int msg)
 		}
 	}
 	VoiceChatTime = get_global_time() + 4; // Change duration
+}
+void CGuild::MutePlayer(LPCHARACTER leader, LPCHARACTER ch)
+{
+	if (!ch || !leader)
+		return;
+	if (GetMember(leader->GetPlayerID())->grade != GUILD_LEADER_GRADE) {
+		leader->ChatPacket(CHAT_TYPE_INFO, "You aren't leader!");
+		return;
+	}
+	if (IsMuted(ch)) {
+		leader->ChatPacket(CHAT_TYPE_INFO, "He already muted.");
+		return;
+	}
+	mutelist.emplace_back(ch);
+	leader->ChatPacket(CHAT_TYPE_INFO, "%s muted in this party.", ch->GetName());
+}
+void CGuild::UnMutePlayer(LPCHARACTER leader, LPCHARACTER ch)
+{
+	if (!ch || !leader)
+		return;
+	if (GetMember(leader->GetPlayerID())->grade != GUILD_LEADER_GRADE) {
+		leader->ChatPacket(CHAT_TYPE_INFO, "You aren't leader!");
+		return;
+	}
+	if (!IsMuted(ch)) {
+		leader->ChatPacket(CHAT_TYPE_INFO, "He never muted.");
+		return;
+	}
+	mutelist.erase(std::remove(mutelist.begin(), mutelist.end(), ch), mutelist.end());
+	leader->ChatPacket(CHAT_TYPE_INFO, "%s unmuted in this party.", ch->GetName());
+}
+bool CGuild::IsMuted(LPCHARACTER ch)
+{
+	const auto it = std::find(mutelist.begin(),mutelist.end(),ch);
+	return it != mutelist.end();
 }
 #endif
