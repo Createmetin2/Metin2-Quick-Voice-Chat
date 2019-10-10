@@ -27,7 +27,7 @@ ACMD(do_voice_chat)
 	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
 
 	if (!*arg1 || !*arg2) {
-		ch->ChatPacket(CHAT_TYPE_INFO, "Syntax: advance <name> <voiceid>");
+		ch->ChatPacket(CHAT_TYPE_INFO, "Syntax: <name> <voiceid>");
 		return;
 	}
 
